@@ -1,4 +1,4 @@
-package com.blaze.mad.dashboard;
+package com.blaze.mutatum.dashboard;
 
 import android.view.LayoutInflater;
 import android.view.View;

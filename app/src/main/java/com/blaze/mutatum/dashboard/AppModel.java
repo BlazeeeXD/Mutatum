@@ -1,4 +1,4 @@
-package com.blaze.mad.dashboard;
+package com.blaze.mutatum.dashboard;
 
 public class AppModel {
     private String title;

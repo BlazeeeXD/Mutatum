@@ -1,4 +1,4 @@
-package com.blaze.mad.dashboard;
+package com.blaze.mutatum.dashboard;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.blaze.mutatum.R;
+import com.blaze.mutatum.MainActivity;
+import com.blaze.mutatum.currency.CurrencyFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,11 +38,26 @@ public class HomeFragment extends Fragment {
         apps.add(new AppModel("Sensors", "Hardware visualizer", android.R.drawable.ic_menu_compass, 3));
         apps.add(new AppModel("Gallery", "Camera & Storage", android.R.drawable.ic_menu_camera, 4));
 
-        // Initialize Adapter with Click Listener
+        // Initialize Adapter with Click Listener and actual routing logic
         DashboardAdapter adapter = new DashboardAdapter(apps, appId -> {
-            // This is where we will route to the other fragments later
-            Toast.makeText(getContext(), "Launching App ID: " + appId, Toast.LENGTH_SHORT).show();
-            // TODO: Add FragmentTransaction logic here
+            MainActivity mainActivity = (MainActivity) getActivity();
+            if (mainActivity != null) {
+                switch (appId) {
+                    case 1:
+                        // Load the Currency App and add to back stack so the back button works!
+                        mainActivity.loadFragment(new CurrencyFragment(), true);
+                        break;
+                    case 2:
+                        Toast.makeText(getContext(), "Media App locked and loading next...", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 3:
+                        Toast.makeText(getContext(), "Sensors App coming soon...", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 4:
+                        Toast.makeText(getContext(), "Gallery App coming soon...", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
         });
 
         recyclerView.setAdapter(adapter);
