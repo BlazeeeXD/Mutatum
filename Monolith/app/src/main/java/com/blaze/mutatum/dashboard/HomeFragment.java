@@ -72,7 +72,7 @@ public class HomeFragment extends Fragment {
                         mainActivity.loadFragment(new CurrencyFragment(), true);
                         break;
                     case 2:
-                        Toast.makeText(getContext(), "Media App locked and loading next...", Toast.LENGTH_SHORT).show();
+                        mainActivity.loadFragment(new com.blaze.mutatum.media.MediaFragment(), true);
                         break;
                     case 3:
                         Toast.makeText(getContext(), "Sensors App coming soon...", Toast.LENGTH_SHORT).show();

@@ -11,4 +11,5 @@
     <color name="primary_accent">#DC2011</color>
     <color name="secondary_accent">#8F0B13</color>
     <color name="highlight_dark">#380F17</color>
+    <color name="invisible">#00FFFFFF</color>
 </resources>
