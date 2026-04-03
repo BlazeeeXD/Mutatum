@@ -10,12 +10,36 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blaze.mutatum.R;
 import java.util.List;
 
+
+/*
+ * PURPOSE:
+ * - Binds AppModel class data to dashboard card UI (the recyclerview)
+ *
+ * DATA:
+ * - appList: list of apps to display
+ * - listener: handles item click events (navigation via appId)
+ *
+ * FLOW:
+ * - onCreateViewHolder(): inflates item layout
+ * - onBindViewHolder():
+ *     binds title, description, icon
+ *     attaches click → triggers listener with appId
+ * - getItemCount(): returns list size
+ *
+ * INNER:
+ * - ViewHolder: caches views (title, description, icon) for performance
+ *
+ * USAGE:
+ * - Used in dashboard screen to render app grid/list
+ * - Clicks delegated via OnAppClickListener (keeps adapter decoupled)
+ *
+ */
+
 public class DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.ViewHolder> {
 
     private List<AppModel> appList;
     private OnAppClickListener listener;
 
-    // Interface for click events
     public interface OnAppClickListener {
         void onAppClick(int appId);
     }

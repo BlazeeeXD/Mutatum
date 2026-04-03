@@ -35,6 +35,39 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+/*
+ * PURPOSE:
+ * - Convert user-entered amount between selected currencies
+ * - Use live API rates, fallback to local rates if unavailable
+ *
+ * UI:
+ * - amountInput: user input
+ * - spinnerFrom / spinnerTo: currency selectors
+ * - resultText: output display
+ * - themeSwitch: dark/light toggle
+ * - btnSwap: swaps currencies
+ * - btnConvert: triggers conversion
+ *
+ * DATA:
+ * - currencies[]: supported currencies (INR, USD, JPY, EUR)
+ * - fallbackRates: hardcoded rates (base = USD)
+ *
+ * STATE:
+ * - lastFromPos / lastToPos: prevents same-currency selection via smart swap logic
+ *
+ * FLOW:
+ * - setupSpinners(): init + enforce unique selections
+ * - setupThemeToggle(): sync + apply theme
+ * - executeConversion():
+ * - validate → fetch API → update UI → fallback if needed
+ *
+ * THREADING:
+ * - ExecutorService: background API call
+ * - Handler: UI updates on main thread
+ *
+ */
+
 public class CurrencyFragment extends Fragment {
 
     private TextInputEditText amountInput;
@@ -42,14 +75,11 @@ public class CurrencyFragment extends Fragment {
     private TextView resultText;
     private SwitchMaterial themeSwitch;
 
-    // Strict adherence to rubric: Only these 4 currencies
     private final String[] currencies = {"INR", "USD", "JPY", "EUR"};
 
-    private int lastFromPos = 1; // Default USD
-    private int lastToPos = 0;   // Default INR
+    private int lastFromPos = 1;
+    private int lastToPos = 0;
 
-    // The Fallback Map (in case the API/Internet fails during grading)
-    // Base is 1 USD
     private final Map<String, Double> fallbackRates = new HashMap<>();
 
     public CurrencyFragment() {
@@ -91,27 +121,22 @@ public class CurrencyFragment extends Fragment {
         spinnerFrom.setAdapter(adapter);
         spinnerTo.setAdapter(adapter);
 
-        // Defaults: USD to INR
         spinnerFrom.setSelection(lastFromPos);
         spinnerTo.setSelection(lastToPos);
 
-        // The Smart Swap Logic
         AdapterView.OnItemSelectedListener spinnerListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (parent == spinnerFrom) {
                     if (position == spinnerTo.getSelectedItemPosition()) {
-                        // Conflict: Swap 'To' to the old 'From'
                         spinnerTo.setSelection(lastFromPos);
                     }
                 } else if (parent == spinnerTo) {
                     if (position == spinnerFrom.getSelectedItemPosition()) {
-                        // Conflict: Swap 'From' to the old 'To'
                         spinnerFrom.setSelection(lastToPos);
                     }
                 }
 
-                // Update our trackers to the new state
                 lastFromPos = spinnerFrom.getSelectedItemPosition();
                 lastToPos = spinnerTo.getSelectedItemPosition();
             }
@@ -120,7 +145,6 @@ public class CurrencyFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {}
         };
 
-        // Attach the listener to both spinners
         spinnerFrom.setOnItemSelectedListener(spinnerListener);
         spinnerTo.setOnItemSelectedListener(spinnerListener);
     }
@@ -156,13 +180,11 @@ public class CurrencyFragment extends Fragment {
 
         resultText.setText("Fetching...");
 
-        // Network call on background thread
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
         executor.execute(() -> {
             try {
-                // Live API Call
                 String urlStr = "https://api.frankfurter.app/latest?amount=" + amount + "&from=" + fromCurr + "&to=" + toCurr;
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -180,14 +202,15 @@ public class CurrencyFragment extends Fragment {
                 handler.post(() -> resultText.setText(String.format("%.2f %s", result, toCurr)));
 
             } catch (Exception e) {
-                // FALLBACK TO HARDCODED RATES IF NO INTERNET OR API ERROR
                 handler.post(() -> {
                     Toast.makeText(getContext(), "Offline mode: Using fallback rates", Toast.LENGTH_SHORT).show();
-                    double baseAmount = amount / fallbackRates.get(fromCurr); // Convert to USD first
-                    double finalAmount = baseAmount * fallbackRates.get(toCurr); // Convert to target
+                    double baseAmount = amount / fallbackRates.get(fromCurr);
+                    double finalAmount = baseAmount * fallbackRates.get(toCurr);
                     resultText.setText(String.format("%.2f %s", finalAmount, toCurr));
                 });
             }
         });
     }
 }
+
+
