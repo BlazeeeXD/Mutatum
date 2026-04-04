@@ -36,8 +36,6 @@ import java.util.concurrent.TimeUnit;
 
 
 /*
- * MediaFragment - Audio + Video playback controller
- *
  * PURPOSE:
  * - Plays local audio files and streamed video URLs
  * - Provides unified controls (play/pause, seek, progress)

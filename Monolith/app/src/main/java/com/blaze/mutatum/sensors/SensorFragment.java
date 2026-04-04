@@ -22,18 +22,46 @@ import androidx.fragment.app.Fragment;
 import com.blaze.mutatum.R;
 import com.google.android.material.card.MaterialCardView;
 
+/*
+ * PURPOSE:
+ * - Displays live sensor data with visual + semantic feedback
+ *
+ * SENSORS:
+ * - Accelerometer: tilt-based dot movement (X/Y)
+ * - Light: lux value → semantic states (DARK → BRIGHT)
+ * - Proximity: near/far detection → alert UI
+ *
+ * UI:
+ * - tvAccelData + tiltDotCard: motion visualization
+ * - tvLightData / tvLightSemantic + progress bar: light intensity + meaning
+ * - cardProximity + tvProximityStatus: proximity state + animations
+ * - tvSystemStatus: global system state
+ *
+ * FLOW:
+ * - setupSensors(): initialize + validate availability
+ * - onResume()/onPause(): register/unregister listeners
+ * - onSensorChanged(): route data to specific handlers
+ *
+ * PROCESSING:
+ * - handleAccelerometer():
+ *     applies low-pass filter → smooth motion + boundary clamp
+ * - handleLight():
+ *     maps lux → semantic labels + dynamic color UI
+ * - handleProximity():
+ *     triggers alert/idle states + animations
+ *
+ */
+
 public class SensorFragment extends Fragment implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor accelSensor, lightSensor, proxSensor;
 
-    // UI Elements
     private TextView tvSystemStatus;
     private TextView tvAccelData, tvLightData, tvLightSemantic, tvProximityStatus, tvProxLabel;
     private MaterialCardView tiltDotCard, cardProximity;
     private ProgressBar lightProgressBar;
 
-    // Smoothing Variables (Low-Pass Filter)
     private float smoothX = 0f;
     private float smoothY = 0f;
 
@@ -109,7 +137,6 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
-    // --- 1. ACCELEROMETER (Physical Feel) ---
     private void handleAccelerometer(float[] values) {
         float rawX = values[0];
         float rawY = values[1];
@@ -120,11 +147,9 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         float targetX = -rawX * (dotBoundary / 9.8f);
         float targetY = rawY * (dotBoundary / 9.8f);
 
-        // THE SECRET SAUCE: Low-Pass Filter Smoothing
         smoothX = smoothX + (targetX - smoothX) * 0.15f;
         smoothY = smoothY + (targetY - smoothY) * 0.15f;
 
-        // Boundary Clamping
         smoothX = Math.max(-dotBoundary, Math.min(smoothX, dotBoundary));
         smoothY = Math.max(-dotBoundary, Math.min(smoothY, dotBoundary));
 
@@ -132,7 +157,6 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         tiltDotCard.setTranslationY(smoothY);
     }
 
-    // --- 2. LIGHT SENSOR (Semantic Meaning) ---
     private void handleLight(float lux) {
         tvLightData.setText((int) lux + " LUX");
         lightProgressBar.setProgress(Math.min((int) lux, 1000));
@@ -142,16 +166,19 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
         if (lux < 50) {
             semanticText = "DARK";
-            color = Color.parseColor("#888888"); // Gray
+            color = Color.parseColor("#888888");
         } else if (lux < 300) {
             semanticText = "DIM";
-            color = getResources().getColor(R.color.text_light, null); // Cream
+            color = getResources().getColor(R.color.text_light, null);
         } else if (lux < 1000) {
             semanticText = "NORMAL";
-            color = Color.parseColor("#4CAF50"); // Green
-        } else {
+            color = Color.parseColor("#4CAF50");
+        } else if (lux < 5000) {
             semanticText = "BRIGHT";
-            color = getResources().getColor(R.color.primary_accent, null); // Red Accent
+            color = getResources().getColor(R.color.primary_accent, null);
+        } else {
+            semanticText = "Yes That Is Sun";
+            color = Color.parseColor("#FFFFFF");
         }
 
         tvLightSemantic.setText(semanticText);
