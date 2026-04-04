@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
-    android:background="?android:attr/colorBackground">
+    android:background="@color/primary_bg_dark">
 
     <TextView
         android:id="@+id/titleText"
@@ -14,7 +14,7 @@
         android:text="Media Center"
         android:textSize="28sp"
         android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textColor="@color/text_light"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -80,7 +80,7 @@
         android:text="System idle"
         android:textAlignment="center"
         android:textSize="14sp"
-        android:textColor="?android:attr/textColorSecondary"
+        android:textColor="@color/text_light"
         app:layout_constraintTop_toBottomOf="@id/actionButtonBarrier" />
 
     <com.google.android.material.card.MaterialCardView
@@ -131,7 +131,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="12dp"
         android:text="00:00 / 00:00"
-        android:textColor="?android:attr/textColorSecondary"
+        android:textColor="@color/text_light"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/audioSeekBar" />
@@ -152,7 +152,7 @@
             android:layout_marginEnd="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_replay_10"
-            app:tint="?android:attr/textColorPrimary" />
+            app:tint="@color/text_light" />
 
         <ImageButton
             android:id="@+id/btnPlayPause"
@@ -161,7 +161,7 @@
             android:background="@drawable/ic_launcher_background"
             android:backgroundTint="@color/invisible"
             android:src="@drawable/ic_play"
-            app:tint="@color/primary_bg_dark" />
+            app:tint="@color/text_light" />
 
         <ImageButton
             android:id="@+id/btnForward"
@@ -170,7 +170,7 @@
             android:layout_marginStart="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_forward_10"
-            app:tint="?android:attr/textColorPrimary" />
+            app:tint="@color/text_light" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

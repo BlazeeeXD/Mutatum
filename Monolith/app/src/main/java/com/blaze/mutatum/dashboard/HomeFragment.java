@@ -69,7 +69,7 @@ public class HomeFragment extends Fragment {
             if (mainActivity != null) {
                 switch (appId) {
                     case 1:
-                        mainActivity.loadFragment(new CurrencyFragment(), true);
+                        mainActivity.loadFragment(new com.blaze.mutatum.currency.CurrencyFragment(), true);
                         break;
                     case 2:
                         mainActivity.loadFragment(new com.blaze.mutatum.media.MediaFragment(), true);
