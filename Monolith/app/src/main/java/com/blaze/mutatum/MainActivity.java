@@ -6,6 +6,27 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import com.blaze.mutatum.dashboard.HomeFragment;
 
+/*
+ * PURPOSE:
+ * - Acts as single activity hosting all fragments (apps)
+ * - Handles fragment transactions and navigation flow
+ *
+ * FLOW:
+ * - onCreate():
+ *     loads HomeFragment on fresh launch
+ *
+ * NAVIGATION:
+ * - loadFragment(fragment, addToBackStack):
+ *     replaces current fragment
+ *     applies animations
+ *     optionally adds to back stack
+ *
+ * ROLE:
+ * - Central entry point for all app modules (dashboard, currency, media, etc.)
+ * - Fragments delegate navigation here
+ *
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -13,21 +34,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inject the Dashboard on startup, but only if it's a fresh launch
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment(), false);
         }
     }
-
-    /**
-     * The master method for navigating between our apps.
-     * @param fragment The fragment (app) to load.
-     * @param addToBackStack True if pressing 'back' should return to the previous screen.
-     */
     public void loadFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-        // Custom animations for that premium feel
         transaction.setCustomAnimations(
                 android.R.anim.fade_in,
                 android.R.anim.fade_out,

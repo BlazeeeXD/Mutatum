@@ -78,7 +78,7 @@ public class HomeFragment extends Fragment {
                         mainActivity.loadFragment(new com.blaze.mutatum.sensors.SensorFragment(), true);
                         break;
                     case 4:
-                        Toast.makeText(getContext(), "Gallery App coming soon...", Toast.LENGTH_SHORT).show();
+                        mainActivity.loadFragment(new com.blaze.mutatum.gallery.GalleryFragment(), true);
                         break;
                 }
             }
