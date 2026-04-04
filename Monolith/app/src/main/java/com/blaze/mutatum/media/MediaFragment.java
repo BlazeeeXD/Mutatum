@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -33,6 +34,50 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.util.concurrent.TimeUnit;
 
+
+/*
+ * MediaFragment - Audio + Video playback controller
+ *
+ * PURPOSE:
+ * - Plays local audio files and streamed video URLs
+ * - Provides unified controls (play/pause, seek, progress)
+ *
+ * MODES:
+ * - Audio Mode: file picker → MediaPlayer → album art + metadata
+ * - Video Mode: URL input → VideoView → stream playback
+ *
+ * UI:
+ * - btnOpenFile / btnOpenUrl: load media
+ * - btnPlayPause / btnRewind / btnForward: transport controls
+ * - mediaSeekBar + tvDuration: progress tracking
+ * - audioPlaceholder / videoView: media display
+ * - statusText: current state feedback
+ *
+ * STATE:
+ * - isVideoMode: toggles audio vs video
+ * - isUserSeeking: prevents UI update conflicts
+ * - currentAudioUri: selected audio source
+ *
+ * FLOW:
+ * - setupToggleGroup(): switches mode + resets state
+ * - setupButtons(): handles file picker, URL input, controls
+ * - prepareAudioPlayer(): initializes MediaPlayer
+ * - extractAlbumArt(): loads embedded artwork + metadata
+ *
+ * PLAYBACK:
+ * - togglePlayPause(): unified control for audio/video
+ * - seekMedia(): +/-10s navigation
+ * - stopAllMedia(): resets active playback
+ *
+ * PROGRESS:
+ * - Handler (updateProgress): updates seekbar + time every 500ms
+ *
+ * LIFECYCLE:
+ * - onDestroy(): releases MediaPlayer + stops handler loop
+ *
+ */
+
+
 public class MediaFragment extends Fragment {
 
     private boolean isVideoMode = false;
@@ -43,6 +88,9 @@ public class MediaFragment extends Fragment {
     private ImageView audioPlaceholder;
     private VideoView videoView;
     private SeekBar mediaSeekBar;
+
+    // New Transport Control Buttons
+    private ImageButton btnPlayPause, btnRewind, btnForward;
 
     private MediaPlayer audioPlayer;
     private Uri currentAudioUri;
@@ -82,6 +130,11 @@ public class MediaFragment extends Fragment {
         audioPlaceholder = view.findViewById(R.id.audioPlaceholder);
         videoView = view.findViewById(R.id.videoView);
         mediaSeekBar = view.findViewById(R.id.audioSeekBar);
+
+        // Bind the new buttons
+        btnPlayPause = view.findViewById(R.id.btnPlayPause);
+        btnRewind = view.findViewById(R.id.btnRewind);
+        btnForward = view.findViewById(R.id.btnForward);
     }
 
     private void setupToggleGroup(View view) {
@@ -119,10 +172,10 @@ public class MediaFragment extends Fragment {
 
         btnOpenUrl.setOnClickListener(v -> showUrlDialog());
 
-        view.findViewById(R.id.btnPlay).setOnClickListener(v -> playMedia());
-        view.findViewById(R.id.btnPause).setOnClickListener(v -> pauseMedia());
-        view.findViewById(R.id.btnStop).setOnClickListener(v -> stopAllMedia());
-        view.findViewById(R.id.btnRestart).setOnClickListener(v -> restartMedia());
+        // Modern 3-button logic
+        btnPlayPause.setOnClickListener(v -> togglePlayPause());
+        btnRewind.setOnClickListener(v -> seekMedia(-10000));
+        btnForward.setOnClickListener(v -> seekMedia(10000));
     }
 
     private void showUrlDialog() {
@@ -143,6 +196,7 @@ public class MediaFragment extends Fragment {
                 statusText.setText("Stream Ready");
                 mediaSeekBar.setMax(videoView.getDuration());
                 videoView.start();
+                btnPlayPause.setImageResource(R.drawable.ic_pause);
             });
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
@@ -183,6 +237,7 @@ public class MediaFragment extends Fragment {
             audioPlayer.setDataSource(requireContext(), currentAudioUri);
             audioPlayer.prepare();
             mediaSeekBar.setMax(audioPlayer.getDuration());
+            btnPlayPause.setImageResource(R.drawable.ic_play);
         } catch (Exception e) {
             Toast.makeText(getContext(), "Error loading audio engine", Toast.LENGTH_SHORT).show();
         }
@@ -249,25 +304,45 @@ public class MediaFragment extends Fragment {
         tvDuration.setText("00:00 / 00:00");
     }
 
-    private void playMedia() {
+    private void togglePlayPause() {
         if (isVideoMode) {
-            videoView.start();
-            statusText.setText("Playing Stream");
-        } else if (audioPlayer != null) {
-            audioPlayer.start();
-            statusText.setText("Playing Audio");
+            if (videoView.isPlaying()) {
+                videoView.pause();
+                btnPlayPause.setImageResource(R.drawable.ic_play);
+                statusText.setText("Stream Paused");
+            } else {
+                videoView.start();
+                btnPlayPause.setImageResource(R.drawable.ic_pause);
+                statusText.setText("Playing Stream");
+            }
         } else {
-            Toast.makeText(getContext(), "Load media first", Toast.LENGTH_SHORT).show();
+            if (audioPlayer != null) {
+                if (audioPlayer.isPlaying()) {
+                    audioPlayer.pause();
+                    btnPlayPause.setImageResource(R.drawable.ic_play);
+                    statusText.setText("Audio Paused");
+                } else {
+                    audioPlayer.start();
+                    btnPlayPause.setImageResource(R.drawable.ic_pause);
+                    statusText.setText("Playing Audio");
+                }
+            } else {
+                Toast.makeText(getContext(), "Load media first", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    private void pauseMedia() {
-        if (isVideoMode && videoView.isPlaying()) {
-            videoView.pause();
-            statusText.setText("Stream Paused");
-        } else if (!isVideoMode && audioPlayer != null && audioPlayer.isPlaying()) {
-            audioPlayer.pause();
-            statusText.setText("Audio Paused");
+    private void seekMedia(int offsetMillis) {
+        if (isVideoMode && (videoView.isPlaying() || videoView.getDuration() > 0)) {
+            int currentPos = videoView.getCurrentPosition();
+            int duration = videoView.getDuration();
+            int newPos = Math.max(0, Math.min(currentPos + offsetMillis, duration));
+            videoView.seekTo(newPos);
+        } else if (!isVideoMode && audioPlayer != null) {
+            int currentPos = audioPlayer.getCurrentPosition();
+            int duration = audioPlayer.getDuration();
+            int newPos = Math.max(0, Math.min(currentPos + offsetMillis, duration));
+            audioPlayer.seekTo(newPos);
         }
     }
 
@@ -280,17 +355,8 @@ public class MediaFragment extends Fragment {
             prepareAudioPlayer();
         }
         resetProgressUI();
+        btnPlayPause.setImageResource(R.drawable.ic_play);
         statusText.setText("System idle");
-    }
-
-    private void restartMedia() {
-        if (isVideoMode) {
-            videoView.seekTo(0);
-            videoView.start();
-        } else if (audioPlayer != null) {
-            audioPlayer.seekTo(0);
-            audioPlayer.start();
-        }
     }
 
     @Override
