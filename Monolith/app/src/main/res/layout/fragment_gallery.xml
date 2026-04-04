@@ -113,7 +113,7 @@
         android:layout_marginBottom="16dp"
         android:src="@android:drawable/ic_menu_camera"
         app:backgroundTint="@color/primary_accent"
-        app:tint="@color/text_light"
+        app:tint="@color/primary_bg_dark"
         app:elevation="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
