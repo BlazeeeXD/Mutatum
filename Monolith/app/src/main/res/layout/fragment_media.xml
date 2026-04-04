@@ -33,6 +33,8 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
+            app:backgroundTint="@color/secondary_accent"
+            android:textColor="@color/primary_bg_dark"
             android:text="Audio" />
 
         <com.google.android.material.button.MaterialButton
@@ -41,6 +43,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_light"
             android:text="Video" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -51,7 +54,9 @@
         android:layout_height="56dp"
         android:layout_marginTop="16dp"
         android:text="Select Audio File"
+        android:textColor="@color/primary_bg_dark"
         app:icon="@android:drawable/ic_menu_agenda"
+        app:backgroundTint="@color/secondary_accent"
         app:layout_constraintTop_toBottomOf="@id/mediaToggleGroup" />
 
     <com.google.android.material.button.MaterialButton
@@ -62,6 +67,8 @@
         android:layout_marginTop="16dp"
         android:text="Stream Video URL"
         android:visibility="gone"
+        android:textColor="@color/primary_bg_dark"
+        app:backgroundTint="@color/secondary_accent"
         app:icon="@android:drawable/ic_menu_search"
         app:layout_constraintTop_toBottomOf="@id/mediaToggleGroup" />
 
@@ -88,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintDimensionRatio="10:9"
         app:cardBackgroundColor="#1A1A1A"
         app:cardCornerRadius="12dp"
         app:cardElevation="8dp"
@@ -103,8 +110,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_gallery"
-                app:tint="#444444" />
+                android:src="@drawable/img_media"
+                />
 
             <VideoView
                 android:id="@+id/videoView"

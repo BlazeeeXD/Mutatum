@@ -117,7 +117,9 @@ public class CurrencyFragment extends Fragment {
     }
 
     private void setupSpinners() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, currencies);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.item_spinner, currencies);
+        adapter.setDropDownViewResource(R.layout.item_spinner);
+
         spinnerFrom.setAdapter(adapter);
         spinnerTo.setAdapter(adapter);
 
@@ -150,14 +152,20 @@ public class CurrencyFragment extends Fragment {
     }
 
     private void setupThemeToggle() {
-        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        themeSwitch.setChecked(currentNightMode == Configuration.UI_MODE_NIGHT_YES);
+        int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+
+        // Unhook the listener temporarily so it doesn't fire while we set up
+        themeSwitch.setOnCheckedChangeListener(null);
+        themeSwitch.setChecked(currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_NO);
 
         themeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // THE CRASH FIX: Only execute if the user physically tapped it
+            if (!buttonView.isPressed()) return;
+
             if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
             } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES);
             }
         });
     }
@@ -210,6 +218,17 @@ public class CurrencyFragment extends Fragment {
                 });
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        int currentNightMode = getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK;
+
+        if (currentNightMode == android.content.res.Configuration.UI_MODE_NIGHT_NO) {
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES);
+        }
     }
 }
 

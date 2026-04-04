@@ -27,6 +27,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 
 import com.blaze.mutatum.R;
 import com.google.android.material.button.MaterialButton;
@@ -137,12 +139,35 @@ public class MediaFragment extends Fragment {
 
     private void setupToggleGroup(View view) {
         MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.mediaToggleGroup);
+        MaterialButton btnModeAudio = view.findViewById(R.id.btnModeAudio);
+        MaterialButton btnModeVideo = view.findViewById(R.id.btnModeVideo);
+
+        // Grab your custom colors
+        int activeBg = getContext().getColor(R.color.secondary_accent);
+        int inactiveBg = Color.parseColor("#000000"); // Dark gray background
+        int activeText = getContext().getColor(R.color.primary_bg_dark);
+        int inactiveText = Color.parseColor("#F4E4C9");
+
+        // Set Initial Default State (Audio Active)
+        btnModeAudio.setBackgroundTintList(ColorStateList.valueOf(activeBg));
+        btnModeAudio.setTextColor(activeText);
+        btnModeVideo.setBackgroundTintList(ColorStateList.valueOf(inactiveBg));
+        btnModeVideo.setTextColor(inactiveText);
+
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
                 stopAllMedia();
                 resetProgressUI();
+
                 if (checkedId == R.id.btnModeVideo) {
                     isVideoMode = true;
+
+                    // SWAP COLORS TO VIDEO
+                    btnModeVideo.setBackgroundTintList(ColorStateList.valueOf(activeBg));
+                    btnModeVideo.setTextColor(activeText);
+                    btnModeAudio.setBackgroundTintList(ColorStateList.valueOf(inactiveBg));
+                    btnModeAudio.setTextColor(inactiveText);
+
                     btnOpenFile.setVisibility(View.GONE);
                     btnOpenUrl.setVisibility(View.VISIBLE);
                     audioPlaceholder.setVisibility(View.GONE);
@@ -150,6 +175,13 @@ public class MediaFragment extends Fragment {
                     statusText.setText("Awaiting Video URL");
                 } else {
                     isVideoMode = false;
+
+                    // SWAP COLORS TO AUDIO
+                    btnModeAudio.setBackgroundTintList(ColorStateList.valueOf(activeBg));
+                    btnModeAudio.setTextColor(activeText);
+                    btnModeVideo.setBackgroundTintList(ColorStateList.valueOf(inactiveBg));
+                    btnModeVideo.setTextColor(inactiveText);
+
                     btnOpenFile.setVisibility(View.VISIBLE);
                     btnOpenUrl.setVisibility(View.GONE);
                     audioPlaceholder.setVisibility(View.VISIBLE);
@@ -224,8 +256,7 @@ public class MediaFragment extends Fragment {
     }
 
     private void resetAudioPlaceholder() {
-        audioPlaceholder.setImageResource(android.R.drawable.ic_menu_gallery);
-        audioPlaceholder.setColorFilter(android.graphics.Color.parseColor("#444444"));
+        audioPlaceholder.setImageResource(R.drawable.img_media);
     }
 
     private void prepareAudioPlayer() {

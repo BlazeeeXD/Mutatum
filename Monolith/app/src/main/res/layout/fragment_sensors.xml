@@ -85,7 +85,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
-                    app:cardBackgroundColor="@color/primary_accent"
+                    app:cardBackgroundColor="@color/secondary_accent"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="6dp" />
             </FrameLayout>
