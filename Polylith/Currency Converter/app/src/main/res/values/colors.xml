@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_bg_dark">#000000</color>
+    <color name="secondary_bg_dark">#222021</color>
+    <color name="text_light">#000000</color>
+
+    <color name="primary_bg_light">#F8F9FA</color>
+    <color name="secondary_bg_light">#FFFFFF</color>
+    <color name="text_dark">#212529</color>
+
+    <color name="primary_accent">#DC2011</color>
+    <color name="secondary_accent">#F4E4C9</color>
+    <color name="highlight_dark">#380F17</color>
+    <color name="invisible">#00FFFFFF</color>
+</resources>
