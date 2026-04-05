@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="@color/primary_bg_dark">
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Media Center"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_light"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/mediaToggleGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:checkedButton="@id/btnModeAudio"
+        app:singleSelection="true"
+        app:layout_constraintTop_toBottomOf="@id/titleText">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeAudio"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@color/secondary_accent"
+            android:textColor="@color/primary_bg_dark"
+            android:text="Audio" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModeVideo"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_light"
+            android:text="Video" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenFile"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:text="Select Audio File"
+        android:textColor="@color/primary_bg_dark"
+        app:icon="@android:drawable/ic_menu_agenda"
+        app:backgroundTint="@color/secondary_accent"
+        app:layout_constraintTop_toBottomOf="@id/mediaToggleGroup" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenUrl"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="16dp"
+        android:text="Stream Video URL"
+        android:visibility="gone"
+        android:textColor="@color/primary_bg_dark"
+        app:backgroundTint="@color/secondary_accent"
+        app:icon="@android:drawable/ic_menu_search"
+        app:layout_constraintTop_toBottomOf="@id/mediaToggleGroup" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/actionButtonBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="btnOpenFile,btnOpenUrl" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="System idle"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textColor="@color/text_light"
+        app:layout_constraintTop_toBottomOf="@id/actionButtonBarrier" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mediaViewportContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintDimensionRatio="10:9"
+        app:cardBackgroundColor="#1A1A1A"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="8dp"
+        app:layout_constraintTop_toBottomOf="@id/statusText">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/audioPlaceholder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/img_media"
+                />
+
+            <VideoView
+                android:id="@+id/videoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <SeekBar
+        android:id="@+id/audioSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:progressTint="@color/primary_accent"
+        android:thumbTint="@color/primary_accent"
+        app:layout_constraintTop_toBottomOf="@id/mediaViewportContainer" />
+
+    <TextView
+        android:id="@+id/tvDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="12dp"
+        android:text="00:00 / 00:00"
+        android:textColor="@color/text_light"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/audioSeekBar" />
+
+    <LinearLayout
+        android:id="@+id/transportControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnRewind"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_replay_10"
+            app:tint="@color/text_light" />
+
+        <ImageButton
+            android:id="@+id/btnPlayPause"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/ic_launcher_background"
+            android:backgroundTint="@color/invisible"
+            android:src="@drawable/ic_play"
+            app:tint="@color/text_light" />
+
+        <ImageButton
+            android:id="@+id/btnForward"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_forward_10"
+            app:tint="@color/text_light" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
